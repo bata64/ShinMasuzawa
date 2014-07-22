@@ -1,0 +1,4 @@
+name = "ShinMasuzawa"
+# badges = ["travis"]
+module_maker="ModuleBuildTiny"
+
