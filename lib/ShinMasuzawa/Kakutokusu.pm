@@ -26,16 +26,7 @@ sub get {
     
     ### 獲得数格納用変数の初期化
     my $kakutokunum;
-    ### 仮の第一位団体の情報格納用変数の初期化
-    my $kari1st;
-    ### 仮の第二位団体の情報格納用変数の初期化
-    my $kari2st;
-    ### 仮の第三位団体の情報格納用変数の初期化
-    my $kari3st;
 
-    $proc = "Process-$rank-1";
-    $log->info("$proc", encode_utf8 "$rank 回目の順位表評価");
-    $log->info("$proc", encode_utf8 "獲得数の取得 開始");
     ###各団体の獲得数の取得
     ###各配列の先頭の値を検索してカウント
     foreach my $dantaimei (@{ $dantai }){
@@ -53,7 +44,6 @@ sub get {
     foreach my $name ( sort keys %hash_kakutokunum ){
         $log->info("$proc", encode_utf8 "団体名 $name の獲得数は $hash_kakutokunum{$name} です。");
     }
-    $log->debug("$proc", encode_utf8 "$rank 回目の獲得数の取得 終了");
     return $kakutokunum;
 }
 
