@@ -115,11 +115,17 @@ ShinMasuzawa::FormatCheck - It's new $module
         exit;
     }
 
+    if ( $chk->check_JudgeAndDantai($proc, $log) != 0 ){
+        exit;
+    }
+
 =head1 DESCRIPTION
 
 ShinMasuzawa::FormatCheck は、新増沢式採点法（新増沢方式）の審査表データのフォーマットチェックをします。
 check_JudgeNumは審査員数のチェック（奇数であること、最大値、最小値以内であること）
 check_GroupNumは団体数のチェック（登録団体数と順位表記載の団体数が一致すること）
+check_JudgeAndDantaiは各順位表の団体が登録団体と一致しているかのチェック
+を行います。
 
 =head1 LICENSE
 

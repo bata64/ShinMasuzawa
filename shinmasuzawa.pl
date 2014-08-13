@@ -17,6 +17,7 @@ use Text::CSV;
 
 use ShinMasuzawa::GetData;
 use ShinMasuzawa::FormatCheck;
+use ShinMasuzawa::Kakutokusu;
 
 ### 設定ファイル読み込み
 my $configfile = 'config/config.pl';
@@ -67,11 +68,10 @@ $log->add(
     }
 );
 
-my $proc = "Process-0";
+my $proc = "Process-1";
 my $proc_org = $proc;
 
 # フォーマットチェック
-### set for ShinMasuzawa::FormatCheck
 my $chk = ShinMasuzawa::FormatCheck->new(
         dantai => $dantai,
         judge => $judge,
@@ -79,7 +79,7 @@ my $chk = ShinMasuzawa::FormatCheck->new(
         judge_min => $config->{judge_min},
 );
 
-$log->info("$proc",encode_utf8 "審査表チェック開始");
+$log->info("$proc", encode_utf8 "審査表チェック開始");
 
 if ( $chk->check_JudgeNum($proc, $log) != 0 ){
     exit;
@@ -93,4 +93,29 @@ if ( $chk->check_JudgeAndDantai($proc, $log) != 0 ){
     exit;
 }
 
-$log->info("$proc",encode_utf8 "審査表チェック終了");
+$log->info("$proc", encode_utf8 "審査表チェック終了");
+
+$proc = "Process-2";
+
+my $rank = 1;
+###以降、順位表確定まで繰り返す
+#while (@{ $dantai }){
+    # 獲得数の取得
+    my $kakutoku = ShinMasuzawa::Kakutokusu->new(
+        dantai => $dantai,
+        judge => $judge,
+        rank => $rank,
+    );
+    
+    my $kakutokusuu = $kakutoku->get($proc, $log);
+
+    # 仮の順位の決定(仮の第一位から第三位)
+
+    # 最上位団体の決定
+
+    # 確定した最上位団体を除いた順位表を作成
+    $rank++;
+#}
+
+
+
