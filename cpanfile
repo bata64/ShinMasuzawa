@@ -5,3 +5,7 @@ on 'test' => sub {
     requires 'Log::Handler', '0.82';
 };
 
+requires 'Log::Handler';
+requires 'POSIX';
+requires 'Math::Combinatorics';
+requires 'Text::CSV';
