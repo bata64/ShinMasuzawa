@@ -97,11 +97,13 @@ if ( $chk->check_JudgeAndDantai($proc, $log) != 0 ){
 $log->info("$proc", encode_utf8 "審査表チェック終了");
 
 $proc = "Process-2";
-
+$proc_org = $proc;
 my $rank = 1;
 ###以降、順位表確定まで繰り返す
 #while (@{ $dantai }){
     $log->info("$proc", encode_utf8 "総合 $rank 位の決定");
+    
+    $proc = "Process-${proc_org}-1-$rank";
     # 獲得数の取得
     $log->info("$proc", encode_utf8 "獲得数の取得 開始");
     my $kakutoku = ShinMasuzawa::Kakutokusu->new(
@@ -111,32 +113,27 @@ my $rank = 1;
     );
     my $kakutokusuu = $kakutoku->get($proc, $log);
     $log->info("$proc", encode_utf8 "獲得数の取得 終了");
+    
+    $proc = "Process-${proc_org}-2-$rank";
     # 仮の順位の決定(仮の第一位から第三位)
     $log->info("$proc", encode_utf8 "仮の第一位から第三位の取得 開始");
     my $pre = ShinMasuzawa::PreRank->new(
-        dantai => $dantai,
         judge => $judge,
+        rank => $rank,
     );
     my $prerank = $pre->get($kakutokusuu, $proc, $log);
-    my $kari1 = $prerank->{kari1st};
-    foreach my $name ( sort keys %{ $kari1 } ){
-        $log->info("$proc", encode_utf8 "仮の第一位: $name 獲得数: $kari1->{$name}");
-    }
-    if ($prerank->{kari2nd}){
-        my $kari2 = $prerank->{kari2nd};
-        foreach my $name ( sort keys %{ $kari2 } ){
-            $log->info("$proc", encode_utf8 "仮の第二位: $name 獲得数: $kari2->{$name}");
-        }
-    }
-    if ($prerank->{kari3rd}){
-        my $kari3 = $prerank->{kari3rd};
-        foreach my $name ( sort keys %{ $kari3 } ){
-            $log->info("$proc", encode_utf8 "仮の第三位: $name 獲得数: $kari3->{$name}");
-        }
-    }
     $log->info("$proc", encode_utf8 "仮の第一位から第三位の取得 終了");
+    
+    $proc = "Process-${proc_org}-3-$rank";
     # 最上位団体の決定
-
+    $log->info("$proc", encode_utf8 "最上位団体の決定 開始");
+    my $top = ShinMasuzawa::DetarmineTop->new(
+        rank => $rank,
+    );
+    my $top_dantai = $top->get($prerank, $proc, $log);
+    #push @array_total_rank, $top_dantai;
+    $log->info("$proc", encode_utf8 "最上位団体の決定 終了");
+    
     # 確定した最上位団体を除いた順位表を作成
     $rank++;
 #}

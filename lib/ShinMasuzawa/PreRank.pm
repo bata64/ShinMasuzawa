@@ -20,7 +20,6 @@ sub new {
 
 sub get {
     my ( $self, $kakutokusuu, $proc, $log ) = @_;
-    my $dantai = $self->{dantai};
     my $judge = $self->{judge};
     my $rank = $self->{rank};
     my %hash_kakutokunum = %{ $kakutokusuu };
@@ -71,6 +70,21 @@ sub get {
         }
         $counter++;
     }
+    foreach my $name ( sort keys %{ $kari1st } ){
+        $log->info("$proc", encode_utf8 "仮の第一位: $name 獲得数: $kari1st->{$name}");
+    }
+    if ($kari2nd){
+        foreach my $name ( sort keys %{ $kari2nd } ){
+            $log->info("$proc", encode_utf8 "仮の第二位: $name 獲得数: $kari2nd->{$name}");
+        }
+    }
+    if ($kari3rd){
+        foreach my $name ( sort keys %{ $kari3rd } ){
+            $log->info("$proc", encode_utf8 "仮の第三位: $name 獲得数: $kari3rd->{$name}");
+        }
+    }
+    
+    
     return {
         kari1st => $kari1st,
         kari2nd => $kari2nd,
@@ -91,7 +105,6 @@ ShinMasuzawa::PreRank - It's new $module
 
     use ShinMasuzawa::PreRank;
     my $pre = ShinMasuzawa::PreRank->new(
-        dantai => $dantai,
         judge => $judge,
     );
     my $prerank = $pre->get($kakutokusuu, $proc, $log);
