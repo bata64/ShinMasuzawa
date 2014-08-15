@@ -32,9 +32,16 @@ unless ( ref($config) eq 'HASH' ) {
     Carp::croak("$configfile does not return HashRef.");
 }
 
-##CSVファイルからデータを取得
+### 入力CSVファイル
+my $input_csv = $ARGV[0] || '新増沢方式審査用紙.csv';
+
+### 出力CSVファイル
+my $output_csv = $ARGV[1] || '総合順位表.csv';
+
+
+### CSVファイルからデータを取得
 my $get = ShinMasuzawa::GetData->new(
-    csv_file => '新増沢方式審査用紙.csv',
+    csv_file => $input_csv,
 );
 my $data = $get->csv;
 
@@ -165,7 +172,7 @@ foreach my $ranking (@array_total_rank){
 # 総合順位表CSVファイルを作成
 ##CSVファイルからデータを取得
 $get = ShinMasuzawa::GetData->new(
-    csv_file => '新増沢方式審査用紙.csv',
+    csv_file => $input_csv,
 );
 $data = $get->csv;
 $judge = $data->{judge};
@@ -181,7 +188,7 @@ my $output = ShinMasuzawa::CreateOutputRanking->new(
     judge => $data->{judge},
     judge_name => $data->{array_judge},
     total_rank => \@array_total_rank,
-    csv_file => '総合順位表.csv',
+    csv_file => $output_csv,
 );
 $output->make;
 
