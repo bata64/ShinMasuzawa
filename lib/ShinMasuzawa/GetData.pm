@@ -69,7 +69,8 @@ sub csv {
     
     for (my $for_num = 1; $for_num <= $judge_num; $for_num++ ){
         my $prefix = "judge\_$for_num";
-        $getjudge->{$prefix} = my $judge_1 = &_getjudge( \@array_dantai, $push->{$prefix} );
+#        $getjudge->{$prefix} = my $judge_1 = &_getjudge( \@array_dantai, $push->{$prefix} );
+        $getjudge->{$prefix} = &_getjudge( \@array_dantai, $push->{$prefix} );
     }
 
     return {
