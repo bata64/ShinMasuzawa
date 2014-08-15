@@ -23,6 +23,12 @@ http://www.jcanet.or.jp/event/concour/shinmasuzawa201001.htm
 を参照ください。
 
 
+###インストール
+必要なCPANモジュールは
+`perl cpanm -L extlib --installdeps .`
+でインストールできます。
+
+
 ###使い方
 「新増沢方式審査用紙.csv」
 
@@ -48,11 +54,8 @@ http://www.jcanet.or.jp/event/concour/shinmasuzawa201001.htm
 を指定して実行します。
 
 
-審査員の数は最大9人まで設定できます。必要な分だけ
+審査員の数は最大9人まで設定できます。必要な分だけ審査用紙に書き足して使用してください。
 
 
+サンプルは審査員が5人となっています。団体名は2014年度神奈川県合唱コンクールの出場団体です。
 
-###インストール
-必要なCPANモジュールは
-`perl cpanm -L extlib --installdeps .`
-でインストールできます。
