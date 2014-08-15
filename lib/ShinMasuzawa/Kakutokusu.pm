@@ -42,7 +42,7 @@ sub get {
     ### 各団体の獲得数を表示
     my %hash_kakutokunum = %$kakutokunum;
     foreach my $name ( sort keys %hash_kakutokunum ){
-        $log->info("$proc", encode_utf8 "団体名 $name の獲得数は $hash_kakutokunum{$name} です。");
+        $log->debug("$proc", encode_utf8 "団体名 $name の獲得数は $hash_kakutokunum{$name} です。");
     }
     return $kakutokunum;
 }

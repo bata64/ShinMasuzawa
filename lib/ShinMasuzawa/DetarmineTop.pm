@@ -63,14 +63,13 @@ sub get {
     my $kakutoku_1_2 = $kakutoku_1st + $kakutoku_2st;
     
     ###ルール1：「仮の第1位」が1団体だけで、かつ、その獲得数が審査員の半数を超えた場合は、その団体が総合第1位となる。
-    if ( $num_1st == 1 && $kakutoku_1st > $kahansu ){
+    if ( $num_1st == 1 && $kakutoku_1st >= $kahansu ){
         foreach my $hash_value (keys %$kari1st){
             $TOP = $hash_value;
         }
         $log->info("$proc", encode_utf8 "ルール1「「仮の第1位」が1団体だけで、かつ、その獲得数が審査員の半数を超えた場合は、その団体が総合第1位となる。」が適用されます。");
-        $log->info("$proc", encode_utf8 "総合第 $rank 位は、$TOP です。");
     ###ルール2：「仮の第1位」が2団体存在し、かつ、両者の獲得数の合計が半数を超える場合には、その2団体で決選投票を行い、総合第1位を決定する。
-    } elsif ( $num_1st == 2 && $kakutoku_1st > $kahansu ){
+    } elsif ( $num_1st == 2 && $kakutoku_1st >= $kahansu ){
         $log->info("$proc", encode_utf8 "ルール2「「仮の第1位」が2団体存在し、かつ、両者の獲得数の合計が半数を超える場合には、その2団体で決選投票を行い、総合第1位を決定する。」が適用されます。");
         my @array_for_kessen = ();
         foreach my $hash_value (keys %{ $kari1st }){
@@ -78,9 +77,8 @@ sub get {
         }
         ### 決選投票の実行
         $TOP = &kessen($self, \@array_for_kessen, $proc, $log);
-        $log->info("$proc", encode_utf8 "総合第 $rank 位は、$TOP です。");
     ###ルール3：「仮の第1位」が3団体以上存在し、かつ、「仮の第1位」全員の獲得数の合計が半数を超える場合には、それらの団体で勝ちポイント選抜を行い、総合第1位を決定する。
-    } elsif ( $num_1st >= 2 && $kakutoku_1st > $kahansu ){
+    } elsif ( $num_1st >= 2 && $kakutoku_1st >= $kahansu ){
         $log->info("$proc", encode_utf8 "ルール3「「仮の第1位」が3団体以上存在し、かつ、「仮の第1位」全員の獲得数の合計が半数を超える場合には、それらの団体で勝ちポイント選抜を行い、総合第1位を決定する。」が適用されます。");
         ### 勝ちポイント選抜の実行
         $TOP = &kachipoint($self, $kari1st, $proc, $log);
@@ -99,7 +97,6 @@ sub get {
             }
             ### 決選投票の実行
             $TOP = &kessen($self, \@array_for_kessen, $proc, $log);
-            $log->info("$proc", encode_utf8 "総合第 $rank 位は、$TOP です。");
         ###「仮の第2位」が複数存在する場合には、最初に「仮の第2位」の団体において決選投票又は勝ちポイント選抜を行い、「第1位候補」を1団体だけ選抜する。次に、「仮の第1位」と「第1位候補」とで決選投票を行い、総合第1位を決定する。
         } else {
             ###「仮の第2位」が2団体の場合は決選投票を行い、「第1位候補」を選抜する。
@@ -127,7 +124,6 @@ sub get {
             push @array_for_kessen, $SECOUND;
             ### 決選投票の実行
             $TOP = &kessen($self, \@array_for_kessen, $proc, $log);
-            $log->info("$proc", encode_utf8 "総合第 $rank 位は、$TOP です。");
         }
     }
     return $TOP;
@@ -142,38 +138,38 @@ sub kessen{
     my $counter_1 = 0;
     my $counter_2 = 0;
     
-    $log->info("$proc", encode_utf8 "$name_1 と $name_2 の決選投票 開始");
+    $log->debug("$proc", encode_utf8 "$name_1 と $name_2 の決選投票 開始");
     foreach my $judgeseat (sort keys %{ $judge }){
         $kessen_result = undef;
         my $counter = 1;
         my $result_per_judge = $judge->{$judgeseat};
         foreach my $jyuni (@{ $result_per_judge }){
             if ( $name_1 eq $jyuni ){
-                $log->info("$proc", encode_utf8 "審査員 $judgeseat の、$name_1 の順位は 第 $counter 位です。");
+                $log->debug("$proc", encode_utf8 "審査員 $judgeseat の、$name_1 の順位は 第 $counter 位です。");
                 $kessen_result->{$name_1} = $counter;
             } elsif ( $name_2 eq $jyuni ){
-                $log->info("$proc", encode_utf8 "審査員 $judgeseat の、$name_2 の順位は 第 $counter 位です。");
+                $log->debug("$proc", encode_utf8 "審査員 $judgeseat の、$name_2 の順位は 第 $counter 位です。");
                 $kessen_result->{$name_2} = $counter;
             }
             $counter++;
         }
         if ( $kessen_result->{$name_1} < $kessen_result->{$name_2} ){
             $counter_1++;
-            $log->info("$proc", encode_utf8 "審査員 $judgeseat の順位表では、$name_1 の方が上位です。");
+            $log->debug("$proc", encode_utf8 "審査員 $judgeseat の順位表では、$name_1 の方が上位です。");
         } else {
             $counter_2++;
-            $log->info("$proc", encode_utf8 "審査員 $judgeseat の順位表では、$name_2 の方が上位です。");
+            $log->debug("$proc", encode_utf8 "審査員 $judgeseat の順位表では、$name_2 の方が上位です。");
         }
-        $log->info("$proc", encode_utf8 "$name_1 が $counter_1 ポイント、$name_2 が $counter_2 ポイントになりました。");
+        $log->debug("$proc", encode_utf8 "$name_1 が $counter_1 ポイント、$name_2 が $counter_2 ポイントになりました。");
     }
     if ( $counter_1 > $counter_2 ){
-        $log->info("$proc", encode_utf8 "よって、$counter_1 対 $counter_2 で、$name_1 が決選投票の勝者となります。");
+        $log->debug("$proc", encode_utf8 "よって、$counter_1 対 $counter_2 で、$name_1 が決選投票の勝者となります。");
         return $name_1;
     } else {
-        $log->info("$proc", encode_utf8 "よって、$counter_2 対 $counter_1 で、$name_2 が決選投票の勝者となります。");
+        $log->debug("$proc", encode_utf8 "よって、$counter_2 対 $counter_1 で、$name_2 が決選投票の勝者となります。");
         return $name_2;
     }
-    $log->info("$proc", encode_utf8 "$name_1 と $name_2 の決選投票 終了");
+    $log->degub("$proc", encode_utf8 "$name_1 と $name_2 の決選投票 終了");
 }
 
 sub kachipoint{
@@ -187,7 +183,7 @@ sub kachipoint{
     foreach my $hash_value (keys %{ $kari_dantai }){
         push @dantai_mei, $hash_value;
     }
-    $log->info("$proc", encode_utf8 "@dantai_mei の勝ちポイント選抜 開始");
+    $log->debug("$proc", encode_utf8 "@dantai_mei の勝ちポイント選抜 開始");
     ### 勝ちポイント選抜実施団体の、2団体の組み合わせ(nC2)計算実施
     my @array_combine = combine(2,@dantai_mei);	#C(3,2)
     ### 各2団体の組み合わせについて、決選投票を実施
@@ -209,7 +205,7 @@ sub kachipoint{
         $counter++;
     }
     $proc = $proc_org;
-    $log->info("$proc", encode_utf8 "@dantai_mei の勝ちポイント選抜の結果は、以下の通りです。");
+    $log->debug("$proc", encode_utf8 "@dantai_mei の勝ちポイント選抜の結果は、以下の通りです。");
     my %hash_kekka = %{ $kekka_kachipoint };
     $counter = 0;
     foreach my $name ( sort { $hash_kekka{$b} <=> $hash_kekka{$a} } keys %hash_kekka ){
@@ -235,15 +231,16 @@ ShinMasuzawa::DetarmineTop - It's new $module
 =head1 SYNOPSIS
 
     use ShinMasuzawa::DetarmineTop;
-    my $pre = ShinMasuzawa::DetarmineTop->new(
-        dantai => $dantai,
+    my $top = ShinMasuzawa::DetarmineTop->new(
         judge => $judge,
+        rank => $rank,
     );
-    my $prerank = $pre->get($kakutokusuu, $proc, $log);
+    my $top_dantai = $top->get($prerank, $proc, $log);
 
 =head1 DESCRIPTION
 
 ShinMasuzawa::DetarmineTop は、新増沢式採点法（新増沢方式）にて最上位団体を決めます。
+審査表（ハッシュのリファレンス）をもとに計算し、最上位団体の名前を返します。
 
 =head1 LICENSE
 

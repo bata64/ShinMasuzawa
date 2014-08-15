@@ -20,6 +20,8 @@ use ShinMasuzawa::FormatCheck;
 use ShinMasuzawa::Kakutokusu;
 use ShinMasuzawa::PreRank;
 use ShinMasuzawa::DetarmineTop;
+use ShinMasuzawa::MakeNewRanking;
+use ShinMasuzawa::CreateOutputRanking;
 
 ### 設定ファイル読み込み
 my $configfile = 'config/config.pl';
@@ -38,6 +40,7 @@ my $data = $get->csv;
 
 ### 出場団体の定義
 my $dantai = $data->{array_dantai};
+my @dantai_org = @{ $dantai };
 
 ### 順位表の定義
 my $judge = $data->{judge};
@@ -73,6 +76,8 @@ $log->add(
 my $proc = "Process-1";
 my $proc_org = $proc;
 
+my @array_total_rank = ();
+
 # フォーマットチェック
 my $chk = ShinMasuzawa::FormatCheck->new(
         dantai => $dantai,
@@ -101,10 +106,9 @@ $proc = "Process-2";
 $proc_org = $proc;
 my $rank = 1;
 ###以降、順位表確定まで繰り返す
-#while (@{ $dantai }){
-    $log->info("$proc", encode_utf8 "総合 $rank 位の決定");
-    
+while (@{ $dantai }){
     $proc = "${proc_org}-1-$rank";
+    $log->info("$proc", encode_utf8 "総合 $rank 位の決定");
     # 獲得数の取得
     $log->info("$proc", encode_utf8 "獲得数の取得 開始");
     my $kakutoku = ShinMasuzawa::Kakutokusu->new(
@@ -133,12 +137,52 @@ my $rank = 1;
         rank => $rank,
     );
     my $top_dantai = $top->get($prerank, $proc, $log);
-    #push @array_total_rank, $top_dantai;
+    $log->info("$proc", encode_utf8 "総合第 $rank 位は、$top_dantai です。");
     $log->info("$proc", encode_utf8 "最上位団体の決定 終了");
+if (!$top_dantai){
+    die;
+}    
+    push @array_total_rank, $top_dantai;
     
     # 確定した最上位団体を除いた順位表を作成
+    my $newrank = ShinMasuzawa::MakeNewRanking->new(
+        judge => $judge,
+        dantai => $dantai,
+    );
+    $newrank->make($top_dantai);    
     $rank++;
-#}
+    $top_dantai = undef;
+    
+}
 
+$log->info("$proc", encode_utf8 "総合順位は以下の通りです。");
+$rank = 1;
+foreach my $ranking (@array_total_rank){
+    $log->info("$proc", encode_utf8 "総合第 $rank 位 $ranking ");
+    $rank++;
+}
 
+# 総合順位表CSVファイルを作成
+##CSVファイルからデータを取得
+$get = ShinMasuzawa::GetData->new(
+    csv_file => '新増沢方式審査用紙.csv',
+);
+$data = $get->csv;
+$judge = $data->{judge};
+### 未定義の順位表を削除
+foreach my $key(keys(%{ $judge })){
+    if (!$judge->{$key}){
+        delete($judge->{$key}); 
+    }
+}
 
+my $output = ShinMasuzawa::CreateOutputRanking->new(
+    dantai => $data->{dantai},
+    judge => $data->{judge},
+    judge_name => $data->{array_judge},
+    total_rank => \@array_total_rank,
+    csv_file => '総合順位表.csv',
+);
+$output->make;
+
+$log->info("$proc", encode_utf8 "全処理終了");
