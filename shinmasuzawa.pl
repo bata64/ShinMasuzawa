@@ -14,6 +14,7 @@ use Log::Handler;
 use POSIX;
 use Math::Combinatorics;
 use Text::CSV;
+use Getopt::Long qw(:config posix_default no_ignore_case gnu_compat);
 
 use ShinMasuzawa::GetData;
 use ShinMasuzawa::FormatCheck;
@@ -22,6 +23,19 @@ use ShinMasuzawa::PreRank;
 use ShinMasuzawa::DetarmineTop;
 use ShinMasuzawa::MakeNewRanking;
 use ShinMasuzawa::CreateOutputRanking;
+
+### help
+my $HELP = undef;
+
+GetOptions ('h|H|help' => \$HELP) || die "Invalid options";
+if ($HELP) {
+    die "Usage: { shinmasuzawa.pl [inputfile] [outputfile] }"
+}
+
+### 引数チェック
+if ( @ARGV > 2 ){
+    die "Usage: { shinmasuzawa.pl [inputfile] [outputfile] }"
+}
 
 ### 設定ファイル読み込み
 my $configfile = 'config/config.pl';
