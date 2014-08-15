@@ -19,6 +19,7 @@ use ShinMasuzawa::GetData;
 use ShinMasuzawa::FormatCheck;
 use ShinMasuzawa::Kakutokusu;
 use ShinMasuzawa::PreRank;
+use ShinMasuzawa::DetarmineTop;
 
 ### 設定ファイル読み込み
 my $configfile = 'config/config.pl';
@@ -103,7 +104,7 @@ my $rank = 1;
 #while (@{ $dantai }){
     $log->info("$proc", encode_utf8 "総合 $rank 位の決定");
     
-    $proc = "Process-${proc_org}-1-$rank";
+    $proc = "${proc_org}-1-$rank";
     # 獲得数の取得
     $log->info("$proc", encode_utf8 "獲得数の取得 開始");
     my $kakutoku = ShinMasuzawa::Kakutokusu->new(
@@ -114,7 +115,7 @@ my $rank = 1;
     my $kakutokusuu = $kakutoku->get($proc, $log);
     $log->info("$proc", encode_utf8 "獲得数の取得 終了");
     
-    $proc = "Process-${proc_org}-2-$rank";
+    $proc = "${proc_org}-2-$rank";
     # 仮の順位の決定(仮の第一位から第三位)
     $log->info("$proc", encode_utf8 "仮の第一位から第三位の取得 開始");
     my $pre = ShinMasuzawa::PreRank->new(
@@ -124,10 +125,11 @@ my $rank = 1;
     my $prerank = $pre->get($kakutokusuu, $proc, $log);
     $log->info("$proc", encode_utf8 "仮の第一位から第三位の取得 終了");
     
-    $proc = "Process-${proc_org}-3-$rank";
+    $proc = "${proc_org}-3-$rank";
     # 最上位団体の決定
     $log->info("$proc", encode_utf8 "最上位団体の決定 開始");
     my $top = ShinMasuzawa::DetarmineTop->new(
+        judge => $judge,
         rank => $rank,
     );
     my $top_dantai = $top->get($prerank, $proc, $log);
