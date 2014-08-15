@@ -3,7 +3,7 @@ use warnings;
 use Data::Dumper;
 
 my $logdir = 'logs';
-my $judge_max = 11;
+my $judge_max = 9;
 my $judge_min = 3;
 
 +{
