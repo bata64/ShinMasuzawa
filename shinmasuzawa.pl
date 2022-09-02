@@ -1,3 +1,5 @@
+#!/usr/bin/env perl 
+
 use strict;
 use warnings;
 use Data::Dumper;
@@ -38,7 +40,7 @@ if ( @ARGV > 2 ){
 }
 
 ### 設定ファイル読み込み
-my $configfile = 'config/config.pl';
+my $configfile = './config/config.pl';
 my $config = do $configfile;
 Carp::croak("$configfile: $@") if $@;
 Carp::croak("$configfile: $!") unless defined $config;
