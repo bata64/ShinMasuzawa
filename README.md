@@ -1,7 +1,7 @@
 ShinMasuzawa
 ============
 
-###概要
+### 概要
 新増沢式採点法で集計を行うプログラム
 
 
@@ -23,13 +23,13 @@ http://www.jcanet.or.jp/event/concour/shinmasuzawa201001.htm
 を参照ください。
 
 
-###インストール
+### インストール
 必要なCPANモジュールは
 `perl cpanm -L extlib --installdeps .`
 でインストールできます。
 
 
-###使い方
+### 使い方
 「新増沢方式審査用紙.csv」
 
 
